@@ -5,7 +5,8 @@ import 'package:bootcampday6_chatroom_app_24jan/presentation/login.dart';
 import '../domain/usecases/get_room.dart';
 
 class ChatRoom extends StatefulWidget {
-  const ChatRoom({super.key});
+  // final Map<String, dynamic> chatRoom;
+  // const ChatRoom({Key? key, required this.chatRoom}) : super(key: key);
 
   @override
   State<ChatRoom> createState() => _ChatRoomState();
