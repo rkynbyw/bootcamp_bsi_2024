@@ -4,6 +4,7 @@ import 'package:bootcampday6_chatroom_app_24jan/presentation/login.dart';
 import 'package:bootcampday6_chatroom_app_24jan/presentation/chatroom.dart';
 
 import '../domain/usecases/get_room.dart';
+import 'helper.dart';
 
 class HomePage extends StatefulWidget {
 
@@ -17,19 +18,24 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
 
  List<String> listChat = [];
+ List<String> roomList = [];
  Map<String, List<Map<String, dynamic>>> roomMessages = {};
 
  @override
  void initState() {
    super.initState();
-   GetUsername().execute(widget.username);
-}
+   GetUsername().execute(widget.username).then((result) {
+     setState(() {
+       roomList = result.cast<String>();
+     });
+   });
+ }
 
   @override
   Widget build(BuildContext context) {
    return Scaffold(
       appBar: AppBar(
-        title: Text('Welcome User, Lets Chat'),
+        title: Text('Welcome ${widget.username}, Lets Chat'),
       ),
         body : Container(
           height: MediaQuery.of(context).size.height - kToolbarHeight,
@@ -37,57 +43,73 @@ class _HomePageState extends State<HomePage> {
           child: FutureBuilder<List>(
               future: GetRoom().execute(widget.username),
               builder: (context, snapshot){
+
                 if (snapshot.hasData){
                   var listChat = snapshot.data!;
                   return ListView (
                       children: List.generate(listChat.length, (i) {
                         return InkWell(
                           onTap: (){
+                            // print(snapshot.data);
+                            // print('roomId: ${listChat[i]['roomId']}');
+                            // print('roomId2: ${listChat[i]}');
+                            // print('roomId3: ${listChat}');
+                            // print(listChat[i]['users'][0]);
+                            // String roomIdAtIndex = roomId[i];
+                            // print (roomList[i]);
+                            // print (widget.username);
                             Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => ChatRoom()));
+                                builder: (context) => ChatRoomPage(
+                                  roomId: roomList[i],
+                                  username: listChat[i]['users'][1],
+                                )));
                           },
-                          child: Container(
-                            padding: EdgeInsets.all(10),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
                             child: Row(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Expanded(
-                                    flex: 1,
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(25.0), // Adjust the border radius as needed
-                                      child: Image.network(
-                                        'https://buffer.com/library/content/images/2023/10/free-images.jpg',
-                                        width: 50,
-                                        height: 50,
-                                        fit: BoxFit.cover,
-                                      ),
+                              children: <Widget>[
+                                CircleAvatar(
+                                  radius: 24.0,
+                                  backgroundColor: Colors.green,
+                                  child: Text(
+                                    listChat[i]['users'][1] != null ? listChat[i]['users'][1][0].toUpperCase() : '',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ),
+                                SizedBox(width: 16.0), // Menambahkan jarak antara CircleAvatar dan Expanded
                                 Expanded(
-                                    flex: 5,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text('${listChat[i]['users'][1]}'),
-                                          Text('${listChat[i]['messages'][listChat[i]['messages'].length-1]['text']}')
-                                        ],
+                                  flex: 5,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '${listChat[i]['users'][1]}',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18,
+                                        ),
                                       ),
-                                    )
+                                      Text('${listChat[i]['messages'][listChat[i]['messages'].length - 1]['text']}'),
+                                    ],
+                                  ),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Expanded(
-                                      flex: 1,
-                                      child: Text('${listChat[i]['messages'][listChat[i]['messages'].length - 1]['timestamp']}')
+                                SizedBox(width: 8.0), // Menambahkan jarak antara Expanded dan Text
+                                Expanded(
+                                  flex: 2,
+                                  child: Text(
+                                    listChat[i]['messages'].isNotEmpty
+                                        ? timestampConvert(int.parse(listChat[i]['messages'].last['timestamp']))
+                                        : 'No messages available',
+                                    textAlign: TextAlign.end,
                                   ),
                                 ),
                               ],
                             ),
                           ),
+
                         );
                       })
                   );
@@ -98,9 +120,20 @@ class _HomePageState extends State<HomePage> {
                 }
               }
           ),
-
-        )
-    );}}
+        ),
+     floatingActionButton: FloatingActionButton(
+       onPressed: () {
+         print('New Message Button Clicked');
+       },
+       child: Icon(Icons.message,
+           color: Colors.white,
+       ),
+       backgroundColor: Colors.green,
+     ),
+     floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+    );
+ }
+}
 
 
     // return Scaffold(

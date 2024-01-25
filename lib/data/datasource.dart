@@ -9,13 +9,13 @@ class MeChatDatasource {
     return response.body;
   }
 
-  Future<String> getRoom(String roomId) async {
-    var response = await http.get(Uri.parse('$url/api/room/$roomId'));
+  Future<String> getRoom(String username) async {
+    var response = await http.get(Uri.parse('$url/api/room/$username'));
     return response.body;
   }
 
-  Future<String> getChat(String username) async {
-    var response = await http.get(Uri.parse('$url/api/chat/$username'));
+  Future<String> getChat(String roomId) async {
+    var response = await http.get(Uri.parse('$url/api/chat/$roomId'));
     return response.body;
   }
 
@@ -27,4 +27,6 @@ class MeChatDatasource {
         body: jsonEncode(<String, dynamic>{'from': from, 'to': to}));
     return response.body;
   }
+
+
 }

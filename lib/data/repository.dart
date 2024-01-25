@@ -29,7 +29,13 @@ class ChatRepository {
   Future<List> getRoom(String username) async {
     var listChatRoom =
       jsonDecode(await meChatDatasource.getRoom(username))['data'];
-    print(listChatRoom[0]);
+    // print(listChatRoom[0]);
     return listChatRoom;
+  }
+
+  Future<List> getChat(String roomId) async {
+    var listChat =
+    jsonDecode(await meChatDatasource.getChat(roomId))['data'];
+    return listChat;
   }
 }
